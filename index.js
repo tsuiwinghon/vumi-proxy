@@ -8,7 +8,14 @@ app.use(cors({
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type']
 }));
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type']
+}));
 app.options('*', cors());
+
+app.use(express.json());
 
 const SYSTEM_PROMPT = `You are Vee, a warm, knowledgeable AI health insurance advisor for VUMI Global Health. You help users understand VUMI Global Flex VIP plans, get personalised quotes, and navigate the application process.
 
