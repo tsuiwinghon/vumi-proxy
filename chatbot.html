@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>VUMI Global Health — AI Advisor</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
+.w{display:flex;flex-direction:column;height:760px;width:100%;max-width:520px;border-radius:14px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.hdr{background:#075E54;padding:11px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.hav{width:40px;height:40px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px;flex-shrink:0;position:relative}
+.hav-dot{position:absolute;bottom:1px;right:1px;width:10px;height:10px;background:#25D366;border-radius:50%;border:2px solid #075E54}
+.hn{color:#fff;font-size:14px;font-weight:600}
+.hs{color:rgba(255,255,255,.75);font-size:11px;margin-top:1px}
+.hactions{margin-left:auto;display:flex;gap:8px}
+.hbtn{background:rgba(255,255,255,.15);border:none;color:#fff;font-size:11.5px;padding:6px 12px;border-radius:10px;cursor:pointer;font-family:inherit;transition:background .15s}
+.hbtn:hover{background:rgba(255,255,255,.28)}
+.hbtn.red{background:#c0392b}
+.hbtn.red:hover{background:#a93226}
+.handoff-banner{background:#f3e5ff;border-top:1px solid #d4a0f0;padding:9px 14px;display:none;align-items:center;gap:10px;flex-shrink:0;font-size:12.5px;color:#5b2c6f}
+.ho-av{width:32px;height:32px;border-radius:50%;background:#8e44ad;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0}
+.ho-info{flex:1}
+.ho-name{font-weight:600;color:#5b2c6f;font-size:13px}
+.ho-sub{color:#8e44ad;font-size:11px}
+.feed{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:6px;background:#ECE5DD}
+.feed::-webkit-scrollbar{width:3px}
+.feed::-webkit-scrollbar-thumb{background:#ccc;border-radius:2px}
+.row{display:flex;flex-direction:column;animation:pop .2s ease}
+@keyframes pop{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.row.b,.row.a{align-items:flex-start}
+.row.u{align-items:flex-end}
+.row.s{align-items:center}
+.sn{font-size:10.5px;font-weight:600;margin-bottom:2px;padding-left:3px}
+.sn.vee{color:#128C7E}
+.sn.agent{color:#8e44ad}
+.bub{max-width:82%;padding:9px 12px 5px;border-radius:9px;font-size:13.5px;line-height:1.58;word-break:break-word}
+.bub.b{background:#fff;color:#111;border-top-left-radius:2px}
+.bub.u{background:#DCF8C6;color:#111;border-top-right-radius:2px}
+.bub.a{background:#f3e5ff;color:#111;border-top-left-radius:2px}
+.bub.s{background:rgba(0,0,0,.07);color:#555;font-size:12px;padding:5px 14px;border-radius:20px}
+.bub b,.bub strong{font-weight:600}
+.bub em,.bub i{font-style:italic;font-size:12px;color:#777}
+.bub ul,.bub ol{padding-left:17px;margin:5px 0}
+.bub li{margin-bottom:4px}
+.bub table{width:100%;border-collapse:collapse;font-size:12.5px;margin:7px 0}
+.bub th{background:#f0f7f0;padding:6px 9px;text-align:left;font-weight:600;color:#128C7E;border-bottom:1px solid #ddeedd;font-size:11.5px}
+.bub td{padding:6px 9px;border-bottom:0.5px solid #f2f2f2;color:#222}
+.bt{font-size:10px;color:#aaa;text-align:right;margin-top:3px}
+.btk{color:#53BDEB}
+.dv{text-align:center;font-size:11px;color:#999;padding:5px 0;user-select:none}
+.typr{display:flex;flex-direction:column;align-items:flex-start}
+.typb{background:#fff;border-radius:9px;border-top-left-radius:2px;padding:11px 15px;display:inline-flex;gap:5px;align-items:center}
+.dot{width:7px;height:7px;background:#aaa;border-radius:50%;animation:bop 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes bop{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.chips{padding:9px 11px;background:#f5f0eb;border-top:1px solid #e0dbd5;display:flex;flex-wrap:wrap;gap:6px;flex-shrink:0;min-height:48px;align-items:center}
+.chip{padding:7px 14px;background:#fff;border:1px solid #128C7E;border-radius:20px;font-size:12px;color:#128C7E;cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap}
+.chip:hover{background:#128C7E;color:#fff;transform:translateY(-1px)}
+.chip.ac{border-color:#8e44ad;color:#8e44ad}
+.chip.ac:hover{background:#8e44ad;color:#fff}
+.ibar{display:flex;align-items:center;gap:8px;padding:9px 11px;background:#F0F0F0;border-top:1px solid #ddd;flex-shrink:0}
+.inp{flex:1;padding:10px 14px;border-radius:22px;border:1px solid #ddd;background:#fff;font-size:13px;font-family:inherit;outline:none;color:#111}
+.inp:disabled{opacity:.6;cursor:not-allowed}
+.sbtn{width:38px;height:38px;border-radius:50%;background:#128C7E;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.sbtn:hover{background:#0f7368}
+.sbtn:disabled{background:#aaa;cursor:not-allowed}
+.sbtn svg{width:15px;height:15px;fill:#fff;transform:translateX(1px)}
+</style>
+</head>
+<body>
+<div class="w">
+  <div class="hdr">
+    <div class="hav">V<div class="hav-dot"></div></div>
+    <div>
+      <div class="hn" id="agentName">VUMI · Vee</div>
+      <div class="hs" id="agentStatus">AI Health Advisor · Online</div>
+    </div>
+    <div class="hactions">
+      <button class="hbtn" id="handoffBtn" onclick="requestHandoff()">Talk to an agent</button>
+      <button class="hbtn red" id="endBtn" onclick="endHandoff()" style="display:none">End agent chat</button>
+    </div>
+  </div>
+  <div class="handoff-banner" id="hoBanner">
+    <div class="ho-av" id="hoAv">S</div>
+    <div class="ho-info">
+      <div class="ho-name" id="hoName">Sarah · VUMI Agent</div>
+      <div class="ho-sub">Licensed health advisor · Responding shortly</div>
+    </div>
+  </div>
+  <div class="feed" id="feed"></div>
+  <div class="chips" id="chips"></div>
+  <div class="ibar">
+    <input class="inp" id="inp" placeholder="Ask me anything about VUMI…" autocomplete="off" disabled/>
+    <button class="sbtn" id="sbtn" disabled><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// CONFIGURATION — update PROXY_URL after deploying the server
+// ─────────────────────────────────────────────────────────────────────────────
+var PROXY_URL = 'https://YOUR_DEPLOYED_SERVER.railway.app/api/chat';
+// Examples:
+//   Railway:  'https://vumi-chatbot.railway.app/api/chat'
+//   Render:   'https://vumi-chatbot.onrender.com/api/chat'
+//   Local:    'http://localhost:3000/api/chat'
+// ─────────────────────────────────────────────────────────────────────────────
+
+var feed=document.getElementById('feed');
+var chipsEl=document.getElementById('chips');
+var inpEl=document.getElementById('inp');
+var sbtnEl=document.getElementById('sbtn');
+
+var chatHistory=[];
+var agentMode=false;
+var agentHistory=[];
+var busy=false;
+var AGENTS=[
+  {name:'Sarah',init:'S',role:'Senior Health Insurance Advisor'},
+  {name:'Marcus',init:'M',role:'International Plans Specialist'},
+  {name:'Priya',init:'P',role:'Health Coverage Consultant'},
+  {name:'James',init:'J',role:'VUMI Global Advisor'}
+];
+var currentAgent=AGENTS[0];
+
+function ts(){var d=new Date();return('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
+function scrollFeed(){feed.scrollTop=feed.scrollHeight;}
+
+function addDivider(t){
+  var d=document.createElement('div');d.className='dv';d.textContent=t;
+  feed.appendChild(d);scrollFeed();
+}
+
+function addBubble(role,html,isSystem,isAgent){
+  var row=document.createElement('div');
+  row.className='row '+(isSystem?'s':isAgent?'a':role==='u'?'u':'b');
+  if(!isSystem){
+    var sn=document.createElement('div');
+    sn.className='sn '+(isAgent?'agent':'vee');
+    sn.textContent=role==='u'?'You':isAgent?currentAgent.name+' · VUMI Agent':'Vee · AI Advisor';
+    if(role==='u'){sn.style.textAlign='right';}
+    row.appendChild(sn);
+  }
+  var bub=document.createElement('div');
+  bub.className='bub '+(isSystem?'s':isAgent?'a':role==='u'?'u':'b');
+  bub.innerHTML=mdToHtml(html)+(isSystem?'':'<div class="bt">'+ts()+(role==='u'?' <span class="btk">✓✓</span>':'')+'</div>');
+  row.appendChild(bub);
+  feed.appendChild(row);scrollFeed();
+}
+
+function mdToHtml(text){
+  // Escape HTML first, then selectively re-apply markdown
+  var s=text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>')
+    .replace(/\*([^*\n]+)\*/g,'<b>$1</b>')
+    .replace(/_([^_\n]+)_/g,'<em>$1</em>');
+
+  // Tables
+  var tableRe=/(\|.+\|[\s\S]*?\|.+\|)/g;
+  s=s.replace(tableRe,function(match){
+    var rows=match.trim().split('\n').filter(function(l){return!/^\|[\s\-|]+$/.test(l.trim());});
+    var html='<table>';
+    rows.forEach(function(row,ri){
+      var cells=row.split('|').slice(1,-1).map(function(c){return c.trim();});
+      html+='<tr>';
+      cells.forEach(function(c){
+        var tag=ri===0?'th':'td';
+        html+='<'+tag+'>'+c+'</'+tag+'>';
+      });
+      html+='</tr>';
+    });
+    return html+'</table>';
+  });
+
+  // Lists
+  var listRe=/((?:^- .+\n?)+)/gm;
+  s=s.replace(listRe,function(match){
+    var items=match.trim().split('\n').map(function(l){return'<li>'+l.replace(/^- /,'')+'</li>';});
+    return'<ul>'+items.join('')+'</ul>';
+  });
+  var olistRe=/((?:^\d+\. .+\n?)+)/gm;
+  s=s.replace(olistRe,function(match){
+    var items=match.trim().split('\n').map(function(l){return'<li>'+l.replace(/^\d+\. /,'')+'</li>';});
+    return'<ol>'+items.join('')+'</ol>';
+  });
+
+  // Line breaks
+  s=s.split('\n').map(function(l){
+    if(l.startsWith('<')||l.trim()==='')return l;
+    return l+'<br>';
+  }).join('\n').replace(/(<br>\n?){3,}/g,'<br><br>');
+
+  return s;
+}
+
+function showTyping(isAgent){
+  var row=document.createElement('div');row.className='typr';row.id='typr';
+  var sn=document.createElement('div');
+  sn.className='sn '+(isAgent?'agent':'vee');
+  sn.textContent=isAgent?currentAgent.name+' · VUMI Agent':'Vee · AI Advisor';
+  var tb=document.createElement('div');tb.className='typb';
+  tb.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  row.appendChild(sn);row.appendChild(tb);
+  feed.appendChild(row);scrollFeed();
+}
+function hideTyping(){var e=document.getElementById('typr');if(e)e.remove();}
+
+function setChips(items){
+  chipsEl.innerHTML='';
+  (items||[]).slice(0,5).forEach(function(item){
+    var b=document.createElement('button');
+    b.className='chip'+(item.agent?' ac':'');
+    b.textContent=item.label||item;
+    b.onclick=function(){if(!busy)send(item.label||item);};
+    chipsEl.appendChild(b);
+  });
+}
+
+function setBusy(state){
+  busy=state;
+  inpEl.disabled=state;
+  sbtnEl.disabled=state;
+}
+
+// ─── OpenAI via proxy ─────────────────────────────────────────────────────────
+async function askOpenAI(messages){
+  var res=await fetch(PROXY_URL,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({messages:messages})
+  });
+  if(!res.ok){
+    var err=await res.json().catch(function(){return{error:'Server error'};});
+    throw new Error(err.error||'Request failed');
+  }
+  var data=await res.json();
+  return data.reply;
+}
+
+// ─── Send ─────────────────────────────────────────────────────────────────────
+async function send(text){
+  if(!text||!text.trim()||busy)return;
+  chipsEl.innerHTML='';
+  addBubble('u',text,false,false);
+  setBusy(true);
+
+  if(agentMode){
+    document.getElementById('agentStatus').textContent=currentAgent.name+' is typing…';
+    showTyping(true);
+    agentHistory.push({role:'user',content:text});
+    try{
+      var reply=await askOpenAI(agentHistory);
+      agentHistory.push({role:'assistant',content:reply});
+      hideTyping();
+      document.getElementById('agentStatus').textContent=currentAgent.name+' · Online';
+      addBubble('b',reply,false,true);
+      setChips([
+        {label:'I want a quote'},{label:'Tell me about the plans'},
+        {label:'How do I apply?'},{label:'End agent chat'}
+      ]);
+      if(text.toLowerCase().includes('end agent'))endHandoff();
+    }catch(err){
+      hideTyping();
+      addBubble('s','Connection issue — please try again',true);
+      agentHistory.pop();
+      setChips([{label:'Try again'},{label:'End agent chat'}]);
+    }
+  } else {
+    document.getElementById('agentStatus').textContent='Vee is typing…';
+    showTyping(false);
+    chatHistory.push({role:'user',content:text});
+    try{
+      var reply=await askOpenAI(chatHistory);
+      chatHistory.push({role:'assistant',content:reply});
+      hideTyping();
+      document.getElementById('agentStatus').textContent='AI Health Advisor · Online';
+      addBubble('b',reply,false,false);
+      setChips([
+        {label:'Get a quote'},{label:'Compare plans'},
+        {label:'What\'s covered?'},{label:'Talk to an agent',agent:true}
+      ]);
+    }catch(err){
+      hideTyping();
+      document.getElementById('agentStatus').textContent='AI Health Advisor · Online';
+      addBubble('s','⚠️ Could not reach the server. Check PROXY_URL is configured.',true);
+      chatHistory.pop();
+      setChips([{label:'Try again'},{label:'Talk to an agent',agent:true}]);
+    }
+  }
+  setBusy(false);
+  inpEl.focus();
+}
+
+// ─── Human handoff ─────────────────────────────────────────────────────────────
+function requestHandoff(){
+  currentAgent=AGENTS[Math.floor(Math.random()*AGENTS.length)];
+  document.getElementById('agentName').textContent=currentAgent.name+' · VUMI Agent';
+  document.getElementById('agentStatus').textContent=currentAgent.role+' · Connecting…';
+  document.getElementById('hoAv').textContent=currentAgent.init;
+  document.getElementById('hoName').textContent=currentAgent.name+' · VUMI Agent';
+  document.getElementById('hoBanner').style.display='flex';
+  document.getElementById('handoffBtn').style.display='none';
+  document.getElementById('endBtn').style.display='inline-block';
+  inpEl.placeholder='Message '+currentAgent.name+'…';
+  addBubble('','Connecting you to a VUMI agent…',true,false);
+  agentMode=true;
+
+  // Build agent system with conversation context
+  var ctx=chatHistory.length>0?'\n\nConversation so far:\n'+chatHistory.map(function(m){return(m.role==='user'?'Customer: ':'Vee AI: ')+m.content;}).join('\n'):'';
+  agentHistory=[{role:'system',content:'You are '+currentAgent.name+', a '+currentAgent.role+' at VUMI Global Health. You are warm, professional, knowledgeable and human — never robotic. You have the same VUMI product knowledge as the AI advisor. Respond naturally and conversationally, like a real insurance advisor would. Keep replies concise. Reference the conversation context where relevant.'+ctx}];
+
+  setTimeout(function(){
+    document.getElementById('agentStatus').textContent=currentAgent.name+' · Online';
+    showTyping(true);
+    setTimeout(async function(){
+      hideTyping();
+      var greet='Hi there! I\'m **'+currentAgent.name+'**, a '+currentAgent.role+' here at VUMI.';
+      if(chatHistory.length>0){greet+=' I can see you\'ve been chatting with Vee — I\'ve got the context, so no need to repeat yourself. How can I help you further?';}
+      else{greet+=' Happy to help you explore our plans or answer any questions. What\'s on your mind?';}
+      agentHistory.push({role:'assistant',content:greet});
+      addBubble('b',greet,false,true);
+      setChips([
+        {label:'I need a quote'},{label:'Which plan suits me?'},
+        {label:'I want to apply'},{label:'I have a specific question'}
+      ]);
+    },1800);
+  },900);
+}
+
+function endHandoff(){
+  agentMode=false;
+  document.getElementById('agentName').textContent='VUMI · Vee';
+  document.getElementById('agentStatus').textContent='AI Health Advisor · Online';
+  document.getElementById('hoBanner').style.display='none';
+  document.getElementById('handoffBtn').style.display='inline-block';
+  document.getElementById('endBtn').style.display='none';
+  inpEl.placeholder='Ask me anything about VUMI…';
+  addBubble('','Agent chat ended. Vee is back.',true,false);
+  setTimeout(function(){
+    addBubble('b','Welcome back! 😊 Happy to keep helping — what else would you like to know?',false,false);
+    setChips([
+      {label:'Get a quote'},{label:'Compare plans'},
+      {label:'What\'s covered?'},{label:'Talk to an agent',agent:true}
+    ]);
+  },400);
+}
+
+// ─── Input handlers ────────────────────────────────────────────────────────────
+inpEl.addEventListener('keydown',function(e){
+  if(e.key==='Enter'){var v=inpEl.value.trim();if(v){inpEl.value='';send(v);}}
+});
+sbtnEl.addEventListener('click',function(){
+  var v=inpEl.value.trim();if(v){inpEl.value='';send(v);}
+});
+
+// ─── Boot ──────────────────────────────────────────────────────────────────────
+(async function boot(){
+  addDivider('Today');
+  try{
+    await fetch(PROXY_URL.replace('/api/chat','/health'));
+    inpEl.disabled=false;sbtnEl.disabled=false;
+    document.getElementById('agentStatus').textContent='AI Health Advisor · Online';
+  }catch(e){
+    document.getElementById('agentStatus').textContent='Server not connected';
+    addBubble('s','⚠️ Server not connected. Update PROXY_URL in the HTML file.',true);
+    inpEl.disabled=false;sbtnEl.disabled=false;
+  }
+  addBubble('b','👋 Hi! I\'m **Vee**, VUMI\'s AI health advisor — powered by OpenAI GPT-4o.\n\nI understand natural language fully, so just talk to me normally. You can ask things like:\n- *"What\'s the difference between Basic and Standard?"*\n- *"I\'m 38, living in the Philippines — what does Superior cost?"*\n- *"Why should I choose VUMI over other insurers?"*\n\nOr tap **Talk to an agent** to speak with a live VUMI advisor.',false,false);
+  setChips([
+    {label:'Why choose VUMI?'},{label:'Get a quote'},
+    {label:'Compare plans'},{label:'What\'s covered?'},
+    {label:'Talk to an agent',agent:true}
+  ]);
+})();
+</script>
+</body>
+</html>
