@@ -87,6 +87,19 @@ CONTACTS: Dubai +971 4 573 2999 | UK +44 330 027 2182 | HK +852 5803 1713 | Thai
 
 FORMATTING: Use **bold** for key terms and amounts. Use bullet lists. Use markdown tables for comparisons. Keep under 150 words unless explicitly asked for detail. Always end with a relevant follow-up question or suggested next step. When showing quotes, always confirm the country and area you used.`;
 
+app.get('/api/chat', (req, res) => {
+  const verifyToken = process.env.VERIFY_TOKEN || 'vumi_verify_token';
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+
+  if (mode === 'subscribe' && token === verifyToken) {
+    res.status(200).send(challenge);
+  } else {
+    res.sendStatus(403);
+  }
+});
+
 app.post('/api/chat', async (req, res) => {
   const { messages } = req.body;
   if (!messages) return res.status(400).json({ error: 'messages required' });
